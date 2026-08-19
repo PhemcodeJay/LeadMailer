@@ -1,0 +1,41 @@
+modules = ["nodejs-24"]
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[deployment.postBuild]
+args = ["npm", "install"]
+env = { "CI" = "true" }
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "LeadMailer Suite"
+
+[[workflows.workflow]]
+name = "LeadMailer Suite"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "node app.js"
+waitForPort = 5000
+
+[agent]
+stack = "NODE"
+expertMode = true
+
+[[ports]]
+localPort = 5000
+externalPort = 80

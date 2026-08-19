@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LeadMailer Suite</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<style>
+  :root { --accent:#6366f1; --accent2:#8b5cf6; --success:#10b981; --danger:#ef4444; --warn:#f59e0b; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  *{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif}
+  body{background:#0f0f1a;color:#e2e8f0;min-height:100vh}
+  #sidebar{width:240px;background:#13131f;border-right:1px solid #1e1e30;flex-shrink:0}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:10px;cursor:pointer;color:#94a3b8;font-size:14px;font-weight:500;transition:all .2s;margin:2px 8px}
+  .nav-item:hover{background:#1e1e30;color:#e2e8f0}
+  .nav-item.active{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white}
+  .nav-item i{width:18px;text-align:center;font-size:15px}
+  #main{flex:1;overflow-y:auto}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+  .card{background:#1a1a2e;border:1px solid #252540;border-radius:16px}
+  .card-sm{background:#1a1a2e;border:1px solid #252540;border-radius:12px}
+  input,textarea,select{background:#0f0f1a;border:1px solid #2a2a45;border-radius:10px;color:#e2e8f0;padding:10px 14px;width:100%;outline:none;font-size:14px;transition:border-color .2s}
+  input:focus,textarea:focus,select:focus{border-color:#6366f1}
+  textarea{resize:vertical}
+  label{display:block;font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+  .btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+  .btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);color:white}
+  .btn-primary:hover{opacity:.9;transform:translateY(-1px)}
+  .btn-success{background:linear-gradient(135deg,#059669,#10b981);color:white}
+  .btn-success:hover{opacity:.9}
+  .btn-danger{background:linear-gradient(135deg,#dc2626,#ef4444);color:white}
+  .btn-danger:hover{opacity:.9}
+  .btn-ghost{background:#252540;color:#94a3b8}
+  .btn-ghost:hover{background:#2f2f50;color:#e2e8f0}
+  .btn-sm{padding:6px 12px;font-size:12px;border-radius:8px}
+  .btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+  .badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700;text-transform:uppercase}
+  .badge-high{background:#7f1d1d;color:#fca5a5}
+  .badge-medium{background:#78350f;color:#fcd34d}
+  .badge-low{background:#1e3a5f;color:#93c5fd}
+  .badge-exec{background:#4c1d95;color:#c4b5fd}
+  .badge-sales{background:#065f46;color:#6ee7b7}
+  .badge-marketing{background:#1e3a5f;color:#93c5fd}
+  .badge-technical{background:#1f2937;color:#9ca3af}
+  .badge-running{background:#065f46;color:#6ee7b7}
+  .badge-completed{background:#1e3a5f;color:#93c5fd}
+  .badge-failed{background:#7f1d1d;color:#fca5a5}
+  .badge-queued{background:#78350f;color:#fcd34d}
+  .stat-card{background:#1a1a2e;border:1px solid #252540;border-radius:14px;padding:20px}
+  .data-table{width:100%;border-collapse:collapse;font-size:13px}
+  .data-table th{color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:10px 14px;border-bottom:1px solid #252540;text-align:left}
+  .data-table td{padding:11px 14px;border-bottom:1px solid #1e1e30}
+  .data-table tr:hover td{background:#1e1e30}
+  .toast{padding:12px 18px;border-radius:12px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:8px;animation:slideUp .3s ease;box-shadow:0 8px 32px rgba(0,0,0,.5)}
+  @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+  ::-webkit-scrollbar{width:5px;height:5px}
+  ::-webkit-scrollbar-track{background:#0f0f1a}
+  ::-webkit-scrollbar-thumb{background:#2a2a45;border-radius:3px}
+  #templateContent{font-family:'Fira Code',monospace;font-size:13px;line-height:1.6;min-height:300px}
+  .dropzone{border:2px dashed #2a2a45;border-radius:12px;padding:32px 20px;text-align:center;cursor:pointer;transition:all .2s}
+  .dropzone:hover,.dropzone.drag-over{border-color:#6366f1;background:rgba(99,102,241,.05)}
+  .progress-bar{height:6px;background:#252540;border-radius:3px;overflow:hidden}
+  .progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#6366f1,#8b5cf6);transition:width .5s}
+  .toggle{position:relative;display:inline-block;width:40px;height:22px}
+  .toggle input{opacity:0;width:0;height:0}
+  .toggle-slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:#252540;border-radius:22px;transition:.3s}
+  .toggle-slider:before{content:"";position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:#64748b;border-radius:50%;transition:.3s}
+  input:checked+.toggle-slider{background:#6366f1}
+  input:checked+.toggle-slider:before{transform:translateX(18px);background:white}
+  .logo-text{background:linear-gradient(135deg,#6366f1,#8b5cf6,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+</style>
+</head>
+<body>
+<div style="display:flex;height:100vh;overflow:hidden;">
+  <div id="sidebar" style="display:flex;flex-direction:column;padding:16px 0;">
+    <div style="padding:12px 24px 20px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-bolt" style="color:white;font-size:16px;"></i></div>
+        <div><div class="logo-text" style="font-size:15px;font-weight:800;">LeadMailer</div><div style="font-size:10px;color:#64748b;font-weight:500;">SUITE v1.0</div></div>
+      </div>
+    </div>
+    <div style="padding:0 0 8px;flex:1;">
+      <div style="padding:6px 16px;font-size:10px;color:#4a4a6a;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">LEAD TOOLS</div>
+      <div class="nav-item active" onclick="showTab('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</div>
+      <div class="nav-item" onclick="showTab('collect')"><i class="fas fa-magnet"></i> Collect Leads</div>
+      <div class="nav-item" onclick="showTab('leads')"><i class="fas fa-database"></i> Lead Manager</div>
+      <div style="padding:14px 16px 4px;font-size:10px;color:#4a4a6a;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:8px;">EMAIL TOOLS</div>
+      <div class="nav-item" onclick="showTab('templates')"><i class="fas fa-file-code"></i> Templates</div>
+      <div class="nav-item" onclick="showTab('recipients')"><i class="fas fa-users"></i> Recipients</div>
+      <div class="nav-item" onclick="showTab('campaigns')"><i class="fas fa-paper-plane"></i> Campaigns</div>
+      <div style="padding:14px 16px 4px;font-size:10px;color:#4a4a6a;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-top:8px;">SYSTEM</div>
+      <div class="nav-item" onclick="showTab('blacklist')"><i class="fas fa-ban"></i> Blacklist</div>
+      <div class="nav-item" onclick="showTab('settings')"><i class="fas fa-cog"></i> Settings</div>
+    </div>
+    <div style="padding:12px 16px;border-top:1px solid #1e1e30;"><div id="sidebarStats" style="font-size:11px;color:#4a4a6a;">Loading...</div></div>
+  </div>
+
+  <div id="main" style="flex:1;overflow-y:auto;">
+    <!-- DASHBOARD -->
+    <div id="tab-dashboard" class="tab-panel active" style="padding:28px;">
+      <div style="margin-bottom:24px;"><h1 style="font-size:22px;font-weight:800;">Dashboard</h1><p style="color:#64748b;font-size:13px;margin-top:2px;">Overview of your leads and campaigns</p></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;margin-bottom:24px;">
+        <div class="stat-card"><div style="color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;">Total Leads</div><div style="font-size:28px;font-weight:800;color:#6366f1;margin-top:4px;" id="ds-leads">—</div></div>
+        <div class="stat-card"><div style="color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;">Lead Emails</div><div style="font-size:28px;font-weight:800;color:#8b5cf6;margin-top:4px;" id="ds-lemails">—</div></div>
+        <div class="stat-card"><div style="color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;">Emails Sent</div><div style="font-size:28px;font-weight:800;color:#10b981;margin-top:4px;" id="ds-sent">—</div></div>
+        <div class="stat-card"><div style="color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;">Campaigns</div><div style="font-size:28px;font-weight:800;color:#f59e0b;margin-top:4px;" id="ds-camps">—</div></div>
+        <div class="stat-card"><div style="color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;">Delivery Rate</div><div style="font-size:28px;font-weight:800;color:#06b6d4;margin-top:4px;" id="ds-rate">—</div></div>
+        <div class="stat-card"><div style="color:#64748b;font-size:11px;font-weight:600;text-transform:uppercase;">Active Now</div><div style="font-size:28px;font-weight:800;color:#ef4444;margin-top:4px;" id="ds-active">—</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+        <div class="card" style="padding:20px;"><div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:14px;">Recent Campaigns</div><div id="dash-campaigns-list" style="color:#64748b;font-size:13px;">Loading...</div></div>
+        <div class="card" style="padding:20px;"><div style="font-size:13px;font-weight:700;color:#94a3b8;margin-bottom:14px;">Quick Actions</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <button class="btn btn-primary" onclick="showTab('collect')"><i class="fas fa-magnet"></i> Collect New Leads</button>
+            <button class="btn btn-success" onclick="showTab('campaigns')"><i class="fas fa-paper-plane"></i> Start Campaign</button>
+            <button class="btn btn-ghost" onclick="showTab('templates')"><i class="fas fa-file-code"></i> Manage Templates</button>
+            <button class="btn btn-ghost" onclick="showTab('settings')"><i class="fas fa-cog"></i> Configure SMTP</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLLECT LEADS -->
+    <div id="tab-collect" class="tab-panel" style="padding:28px;">
+      <div style="margin-bottom:24px;"><h1 style="font-size:22px;font-weight:800;">Collect Leads</h1><p style="color:#64748b;font-size:13px;margin-top:2px;">Import emails & phones via text, CSV, or web scraping</p></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+        <div class="card" style="padding:22px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#059669,#10b981);border-radius:10px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-keyboard" style="color:white;"></i></div>
+            <div><div style="font-weight:700;font-size:15px;">Text Input</div><div style="font-size:12px;color:#64748b;">Paste emails or phones</div></div>
+          </div>
+          <label>Paste emails/phones (comma, newline, or space separated)</label>
+          <textarea id="textInput" rows="5" placeholder="ceo@company.com&#10;sales@business.net&#10;+1-234-567-8901"></textarea>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn btn-success" id="validateTextBtn" onclick="validateText()" style="flex:1;"><i class="fas fa-check-circle"></i> Validate</button>
+            <button class="btn btn-ghost" onclick="clearTextSession()"><i class="fas fa-times"></i></button>
+          </div>
+          <div id="textResults" style="margin-top:14px;display:none;"></div>
+        </div>
+        <div class="card" style="padding:22px;">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+            <div style="width:38px;height:38px;background:linear-gradient(135deg,#2563eb,#3b82f6);border-radius:10px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-file-csv" style="color:white;"></i></div>
+            <div><div style="font-weight:700;font-size:15px;">CSV Validator</div><div style="font-size:12px;color:#64748b;">Upload a CSV with contacts</div></div>
+          </div>
+          <div class="dropzone" id="csvDropzone" onclick="document.getElementById('csvFile').click()">
+            <i class="fas fa-cloud-upload-alt" style="font-size:28px;color:#4a4a6a;margin-bottom:8px;"></i>
+            <div style="font-size:13px;color:#94a3b8;font-weight:600;">Drop CSV here or click to browse</div>
+            <div style="font-size:11px;color:#64748b;margin-top:4px;">Detects emails & phone numbers</div>
+            <div id="csvSelectedName" style="display:none;margin-top:8px;font-size:12px;color:#6366f1;font-weight:600;"></div>
+          </div>
+          <input type="file" id="csvFile" accept=".csv" style="display:none;" onchange="handleCsvSelect(this)">
+          <button class="btn btn-primary" id="uploadCsvBtn" onclick="uploadLeadCsv()" style="width:100%;margin-top:12px;" disabled><i class="fas fa-upload"></i> Process CSV</button>
+          <div id="csvResults" style="margin-top:14px;display:none;"></div>
+        </div>
+      </div>
+      <div class="card" style="padding:22px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+          <div style="width:38px;height:38px;background:linear-gradient(135deg,#7c3aed,#8b5cf6);border-radius:10px;display:flex;align-items:center;justify-content:center;"><i class="fas fa-spider" style="color:white;"></i></div>
+          <div><div style="font-weight:700;font-size:15px;">Web Extractor</div><div style="font-size:12px;color:#64748b;">Scrape contact details from websites</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-end;">
+          <div style="flex:1;"><label>URLs (one per line, max 20)</label><textarea id="urlInput" rows="3" placeholder="https://company.com/contact&#10;https://another-site.com/about"></textarea></div>
+          <button class="btn btn-primary" id="extractBtn" onclick="extractWeb()" style="height:42px;white-space:nowrap;"><i class="fas fa-search"></i> Extract</button>
+        </div>
+        <div id="webResults" style="margin-top:14px;display:none;"></div>
+      </div>
+    </div>
+
+    <!-- LEAD MANAGER -->
+    <div id="tab-leads" class="tab-panel" style="padding:28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:8px;">
+        <div><h1 style="font-size:22px;font-weight:800;">Lead Manager</h1><p style="color:#64748b;font-size:13px;margin-top:2px;">Sort, filter, and export your collected leads</p></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;" id="leadActions" style="display:none;">
+          <button class="btn btn-ghost btn-sm" onclick="sortLeads('priority')"><i class="fas fa-flag"></i> Priority</button>
+          <button class="btn btn-ghost btn-sm" onclick="sortLeads('role')"><i class="fas fa-user-tag"></i> Role</button>
+          <button class="btn btn-ghost btn-sm" onclick="sortLeads('domain')"><i class="fas fa-globe"></i> Domain</button>
+          <button class="btn btn-ghost btn-sm" onclick="sortLeads('type')"><i class="fas fa-layer-group"></i> Type</button>
+          <div style="width:1px;background:#252540;"></div>
+          <button class="btn btn-success btn-sm" onclick="exportLeads('csv')"><i class="fas fa-file-csv"></i> CSV</button>
+          <button class="btn btn-primary btn-sm" onclick="exportLeads('excel')"><i class="fas fa-file-excel"></i> Excel</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportLeads('json')"><i class="fas fa-code"></i> JSON</button>
+        </div>
+      </div>
+      <div id="leadNoSession" style="text-align:center;padding:60px 20px;color:#64748b;">
+        <i class="fas fa-database" style="font-size:40px;margin-bottom:12px;color:#2a2a45;"></i>
+        <div style="font-size:16px;font-weight:600;margin-bottom:6px;">No active session</div>
+        <div style="font-size:13px;">Collect some leads first, then come back here to sort and export them.</div>
+        <button class="btn btn-primary" onclick="showTab('collect')" style="margin-top:16px;"><i class="fas fa-magnet"></i> Collect Leads</button>
+      </div>
+      <div id="leadSessionInfo" style="display:none;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;padding:12px 16px;background:#1a1a2e;border:1px solid #252540;border-radius:12px;">
+          <i class="fas fa-id-badge" style="color:#6366f1;"></i>
+          <div style="font-size:12px;color:#64748b;">Session: <span id="sessionBadge" style="font-family:monospace;color:#a78bfa;"></span></div>
+          <div style="font-size:12px;color:#64748b;">•</div>
+          <div style="font-size:13px;font-weight:700;color:#e2e8f0;" id="sessionLeadCount">0 leads</div>
+          <button class="btn btn-danger btn-sm" onclick="deleteSession()" style="margin-left:auto;"><i class="fas fa-trash"></i> Clear</button>
+        </div>
+        <div id="sortedLeadView"></div>
+      </div>
+    </div>
+
+    <!-- TEMPLATES -->
+    <div id="tab-templates" class="tab-panel" style="padding:28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <div><h1 style="font-size:22px;font-weight:800;">Email Templates</h1><p style="color:#64748b;font-size:13px;margin-top:2px;">Create and manage HTML email templates</p></div>
+        <button class="btn btn-primary" onclick="openTemplateEditor()"><i class="fas fa-plus"></i> New Template</button>
+      </div>
+      <div style="display:grid;grid-template-columns:320px 1fr;gap:20px;">
+        <div><div id="templateList" style="display:flex;flex-direction:column;gap:8px;"></div></div>
+        <div id="templateEditor" style="display:none;">
+          <div class="card" style="padding:22px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div style="font-weight:700;font-size:15px;" id="editorTitle">New Template</div>
+              <div style="display:flex;gap:8px;">
+                <button class="btn btn-ghost btn-sm" onclick="previewTemplate()"><i class="fas fa-eye"></i> Preview</button>
+                <button class="btn btn-success btn-sm" onclick="saveTemplate()"><i class="fas fa-save"></i> Save</button>
+                <button class="btn btn-ghost btn-sm" onclick="closeTemplateEditor()"><i class="fas fa-times"></i></button>
+              </div>
+            </div>
+            <div style="margin-bottom:12px;">
+              <label>Template Name</label>
+              <input id="templateName" placeholder="e.g. welcome_email" style="margin-bottom:8px;">
+              <div style="font-size:11px;color:#64748b;">Use {{name}}, {{email}}, {{company}}, {{city}}, {{cta_url}}, {{unsubscribe_url}} as variables</div>
+            </div>
+            <label>HTML Content</label>
+            <textarea id="templateContent" rows="18"></textarea>
+            <div style="margin-top:14px;">
+              <div style="font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px;">Attachments</div>
+              <div id="attachmentList" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;"></div>
+              <div class="dropzone" style="padding:16px;" onclick="document.getElementById('attachFile').click()">
+                <i class="fas fa-paperclip" style="color:#64748b;margin-right:6px;"></i><span style="font-size:12px;color:#64748b;">Add attachment</span>
+              </div>
+              <input type="file" id="attachFile" style="display:none;" onchange="uploadAttachment(this)">
+            </div>
+          </div>
+        </div>
+        <div id="templatePlaceholder" style="display:flex;align-items:center;justify-content:center;color:#64748b;flex-direction:column;gap:8px;">
+          <i class="fas fa-file-code" style="font-size:36px;color:#2a2a45;"></i><div style="font-size:13px;">Select or create a template</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RECIPIENTS -->
+    <div id="tab-recipients" class="tab-panel" style="padding:28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <div><h1 style="font-size:22px;font-weight:800;">Recipients</h1><p style="color:#64748b;font-size:13px;margin-top:2px;">Upload CSV files with email recipients for campaigns</p></div>
+        <button class="btn btn-primary" onclick="document.getElementById('recipientFile').click()"><i class="fas fa-upload"></i> Upload CSV</button>
+      </div>
+      <input type="file" id="recipientFile" accept=".csv" style="display:none;" onchange="uploadRecipientCsv(this)">
+      <div style="font-size:11px;color:#64748b;margin-bottom:14px;padding:10px 14px;background:#1a1a2e;border:1px solid #252540;border-radius:10px;">
+        <i class="fas fa-info-circle" style="color:#6366f1;margin-right:6px;"></i>CSV must have an <strong style="color:#a78bfa;">email</strong> column. Optional: <strong style="color:#a78bfa;">name</strong>, <strong style="color:#a78bfa;">company</strong>, <strong style="color:#a78bfa;">city</strong>
+      </div>
+      <div id="recipientFileList"></div>
+    </div>
+
+    <!-- CAMPAIGNS -->
+    <div id="tab-campaigns" class="tab-panel" style="padding:28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <div><h1 style="font-size:22px;font-weight:800;">Campaigns</h1><p style="color:#64748b;font-size:13px;margin-top:2px;">Launch and monitor email campaigns</p></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 380px;gap:20px;">
+        <div><div id="campaignList" style="display:flex;flex-direction:column;gap:10px;"></div></div>
+        <div class="card" style="padding:22px;height:fit-content;">
+          <div style="font-weight:700;font-size:15px;margin-bottom:16px;"><i class="fas fa-rocket" style="color:#6366f1;margin-right:8px;"></i>Launch Campaign</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div><label>Campaign Name</label><input id="campName" placeholder="e.g. Q1 Outreach"></div>
+            <div><label>Subject Line</label><input id="campSubject" placeholder="e.g. Hey {{name}}, quick question"></div>
+            <div><label>Template</label><select id="campTemplate"><option value="">— select template —</option></select></div>
+            <div><label>Recipients File</label><select id="campRecipients"><option value="">— select recipients —</option></select></div>
+            <div><label>Reply-To Email (optional)</label><input id="campReplyTo" placeholder="reply@yourdomain.com"></div>
+            <div><label>Rate Limit (emails/min)</label><input id="campRate" type="number" value="5" min="1" max="120"></div>
+            <button class="btn btn-primary" onclick="startCampaign()" style="width:100%;justify-content:center;margin-top:4px;"><i class="fas fa-paper-plane"></i> Start Campaign</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLACKLIST -->
+    <div id="tab-blacklist" class="tab-panel" style="padding:28px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <div><h1 style="font-size:22px;font-weight:800;">Blacklist</h1><p style="color:#64748b;font-size:13px;margin-top:2px;">Emails that will never receive campaigns</p></div>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('blImportFile').click()"><i class="fas fa-upload"></i> Import CSV</button>
+          <button class="btn btn-ghost btn-sm" onclick="exportBlacklist()"><i class="fas fa-download"></i> Export</button>
+        </div>
+      </div>
+      <input type="file" id="blImportFile" accept=".csv" style="display:none;" onchange="importBlacklist(this)">
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:16px;">
+        <div class="card" style="padding:18px;">
+          <div style="font-size:12px;font-weight:600;color:#64748b;margin-bottom:10px;" id="blacklistCount">Loading...</div>
+          <div id="blacklistItems" style="max-height:400px;overflow-y:auto;"></div>
+        </div>
+        <div class="card" style="padding:18px;height:fit-content;">
+          <div style="font-weight:700;font-size:13px;margin-bottom:12px;">Add Emails</div>
+          <textarea id="blAddEmails" rows="5" placeholder="email1@example.com&#10;email2@example.com"></textarea>
+          <button class="btn btn-danger" onclick="addToBlacklist()" style="width:100%;justify-content:center;margin-top:10px;"><i class="fas fa-ban"></i> Add to Blacklist</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="tab-settings" class="tab-panel" style="padding:28px;">
+      <div style="margin-bottom:24px;"><h1 style="font-size:22px;font-weight:800;">Settings</h1><p style="color:#64748b;font-size:13px;margin-top:2px;">SMTP, sender identity, and advanced options</p></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div class="card" style="padding:22px;">
+          <div style="font-weight:700;font-size:15px;margin-bottom:16px;"><i class="fas fa-server" style="color:#6366f1;margin-right:8px;"></i>SMTP Server</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div><label>SMTP Server</label><input id="smtpServer" placeholder="smtp.gmail.com"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+              <div><label>Port</label><input id="smtpPort" type="number" value="587"></div>
+              <div><label>Protocol</label><select id="smtpProto"><option value="tls">STARTTLS</option><option value="ssl">SSL/TLS</option><option value="none">None</option></select></div>
+            </div>
+            <div><label>Username</label><input id="smtpUser" placeholder="your@email.com"></div>
+            <div><label>Password</label><input id="smtpPass" type="password" placeholder="••••••••"></div>
+            <button class="btn btn-ghost btn-sm" onclick="testSmtp()" id="testSmtpBtn"><i class="fas fa-plug"></i> Test Connection</button>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="padding:22px;margin-bottom:16px;">
+            <div style="font-weight:700;font-size:15px;margin-bottom:16px;"><i class="fas fa-user-circle" style="color:#8b5cf6;margin-right:8px;"></i>Sender Identity</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div><label>From Name</label><input id="fromName" placeholder="Your Name or Company"></div>
+              <div><label>From Email</label><input id="fromEmail" placeholder="sender@yourdomain.com"></div>
+              <div><label>Default Reply-To</label><input id="replyTo" placeholder="replies@yourdomain.com"></div>
+            </div>
+          </div>
+          <div class="card" style="padding:22px;">
+            <div style="font-weight:700;font-size:15px;margin-bottom:16px;"><i class="fas fa-link" style="color:#10b981;margin-right:8px;"></i>Campaign URLs</div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div><label>CTA URL</label><input id="ctaUrl" placeholder="https://yoursite.com/landing"></div>
+              <div><label>Unsubscribe URL</label><input id="unsubUrl" placeholder="https://yoursite.com/unsubscribe"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="padding:22px;">
+          <div style="font-weight:700;font-size:15px;margin-bottom:16px;"><i class="fas fa-sliders-h" style="color:#f59e0b;margin-right:8px;"></i>Advanced Options</div>
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div><label>Sending Method</label><select id="advMethod"><option value="SMTP">SMTP (Authenticated)</option><option value="MX">MX Direct (No Auth Required)</option></select></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div><div style="font-size:13px;font-weight:600;">Use Proxy</div><div style="font-size:11px;color:#64748b;">Route sends through SOCKS/HTTP proxy</div></div>
+              <label class="toggle"><input type="checkbox" id="useProxy" onchange="toggleProxyFields()"><span class="toggle-slider"></span></label>
+            </div>
+            <div id="proxyFields" style="display:none;padding:14px;background:#0f0f1a;border-radius:10px;flex-direction:column;gap:10px;">
+              <div><label>Proxy Type</label><select id="proxyType"><option>SOCKS5</option><option>SOCKS4</option><option>HTTP</option><option>HTTPS</option></select></div>
+              <div style="display:grid;grid-template-columns:1fr auto;gap:8px;">
+                <div><label>Proxy Host</label><input id="proxyHost" placeholder="proxy.example.com"></div>
+                <div><label>Port</label><input id="proxyPort" type="number" value="1080" style="width:80px;"></div>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div><label>Username</label><input id="proxyUser" placeholder="optional"></div>
+                <div><label>Password</label><input id="proxyPass" type="password" placeholder="optional"></div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <div><div style="font-size:13px;font-weight:600;">Concurrent Sending</div><div style="font-size:11px;color:#64748b;">Send to multiple recipients in parallel</div></div>
+              <label class="toggle"><input type="checkbox" id="useConcurrency" onchange="toggleConcurrency()"><span class="toggle-slider"></span></label>
+            </div>
+            <div id="concurrencyField" style="display:none;"><label>Concurrency Limit</label><input id="concurrencyLimit" type="number" value="5" min="1" max="50"></div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="padding:22px;margin-bottom:16px;">
+            <div style="font-weight:700;font-size:15px;margin-bottom:16px;"><i class="fas fa-tachometer-alt" style="color:#06b6d4;margin-right:8px;"></i>Rate Control</div>
+            <div><label>Emails Per Minute (rate limit)</label><input id="rateLimit" type="number" value="5" min="1" max="300"></div>
+          </div>
+          <button class="btn btn-primary" onclick="saveSettings()" style="width:100%;justify-content:center;"><i class="fas fa-save"></i> Save All Settings</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div id="previewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;align-items:center;justify-content:center;">
+  <div style="background:#1a1a2e;border:1px solid #252540;border-radius:16px;width:760px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;">
+    <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #252540;">
+      <div style="font-weight:700;">Template Preview</div>
+      <button class="btn btn-ghost btn-sm" onclick="closePreview()"><i class="fas fa-times"></i></button>
+    </div>
+    <iframe id="previewFrame" style="flex:1;border:none;background:white;min-height:500px;"></iframe>
+  </div>
+</div>
+
+<div id="toastContainer" style="position:fixed;bottom:20px;right:20px;z-index:200;display:flex;flex-direction:column;gap:8px;"></div>
+
+<script>
+const state = { currentSession: null, currentSort: 'priority', editingTemplate: null, config: null };
+
+function showTab(tab) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick') === `showTab('${tab}')`) n.classList.add('active');
+  });
+  if (tab === 'dashboard') loadDashboard();
+  if (tab === 'templates') loadTemplates();
+  if (tab === 'recipients') loadRecipients();
+  if (tab === 'campaigns') loadCampaigns();
+  if (tab === 'blacklist') loadBlacklist();
+  if (tab === 'settings') loadSettings();
+}
+
+function toast(msg, type='info') {
+  const colors = { success:'#065f46', error:'#7f1d1d', warning:'#78350f', info:'#1e3a5f' };
+  const icons = { success:'check-circle', error:'exclamation-circle', warning:'exclamation-triangle', info:'info-circle' };
+  const border = { success:'#10b981', error:'#ef4444', warning:'#f59e0b', info:'#3b82f6' };
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.style.cssText = `background:${colors[type]};border:1px solid ${border[type]};color:white;`;
+  el.innerHTML = `<i class="fas fa-${icons[type]}"></i><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 4000);
+}
+
+function setLoading(btn, loading, text='Processing...') {
+  if (loading) { btn.dataset.orig = btn.innerHTML; btn.disabled = true; btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${text}`; }
+  else { btn.disabled = false; btn.innerHTML = btn.dataset.orig; }
+}
+
+function escHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+// DASHBOARD
+async function loadDashboard() {
+  try {
+    const r = await fetch('/api/stats');
+    const s = await r.json();
+    document.getElementById('ds-leads').textContent = s.total_leads ?? '—';
+    document.getElementById('ds-lemails').textContent = s.lead_emails ?? '—';
+    document.getElementById('ds-sent').textContent = s.emails_sent ?? '—';
+    document.getElementById('ds-camps').textContent = s.total_campaigns ?? '—';
+    document.getElementById('ds-rate').textContent = (s.delivery_rate ?? 0) + '%';
+    document.getElementById('ds-active').textContent = s.active_campaigns ?? '—';
+    document.getElementById('sidebarStats').innerHTML = `<div>${s.total_leads ?? 0} leads &nbsp;•&nbsp; ${s.emails_sent ?? 0} sent</div>`;
+  } catch(e) {}
+  try {
+    const r2 = await fetch('/api/campaigns');
+    const d2 = await r2.json();
+    const camps = (d2.campaigns || []).slice(-5).reverse();
+    if (!camps.length) document.getElementById('dash-campaigns-list').innerHTML = '<div style="color:#4a4a6a;font-size:13px;">No campaigns yet</div>';
+    else document.getElementById('dash-campaigns-list').innerHTML = camps.map(c => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid #1e1e30;">
+        <div><div style="font-size:13px;font-weight:600;">${escHtml(c.name || c.id)}</div><div style="font-size:11px;color:#64748b;">${c.stats?.sent||0} sent / ${c.total_recipients||0} total</div></div>
+        <span class="badge badge-${c.status}">${c.status}</span>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+// LEAD COLLECTION
+async function validateText() {
+  const text = document.getElementById('textInput').value.trim();
+  if (!text) return toast('Please enter some text', 'error');
+  const btn = document.getElementById('validateTextBtn');
+  setLoading(btn, true, 'Validating...');
+  try {
+    const r = await fetch('/api/text-validator', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ text, session_id: state.currentSession }) });
+    const d = await r.json();
+    if (d.success) { state.currentSession = d.session_id; showValidationResults('textResults', d); updateLeadSession(); toast(`${d.stats.valid} valid leads found`, 'success'); }
+    else toast(d.error || 'Validation failed', 'error');
+  } catch(e) { toast('Request failed', 'error'); }
+  finally { setLoading(btn, false); }
+}
+
+function handleCsvSelect(input) {
+  if (input.files[0]) { document.getElementById('csvSelectedName').style.display = 'block'; document.getElementById('csvSelectedName').textContent = input.files[0].name; document.getElementById('uploadCsvBtn').disabled = false; }
+}
+
+async function uploadLeadCsv() {
+  const file = document.getElementById('csvFile').files[0];
+  if (!file) return toast('Select a file first', 'error');
+  const btn = document.getElementById('uploadCsvBtn');
+  setLoading(btn, true, 'Processing...');
+  const fd = new FormData();
+  fd.append('file', file);
+  if (state.currentSession) fd.append('session_id', state.currentSession);
+  try {
+    const r = await fetch('/api/csv-validator', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.success) { state.currentSession = d.session_id; showValidationResults('csvResults', d); updateLeadSession(); toast(`${d.stats.valid} valid leads from CSV`, 'success'); }
+    else toast(d.error || 'Failed', 'error');
+  } catch(e) { toast('Upload failed', 'error'); }
+  finally { setLoading(btn, false); }
+}
+
+async function extractWeb() {
+  const raw = document.getElementById('urlInput').value.trim();
+  if (!raw) return toast('Enter at least one URL', 'error');
+  const urls = raw.split('\n').map(u => u.trim()).filter(Boolean).slice(0, 20);
+  const btn = document.getElementById('extractBtn');
+  setLoading(btn, true, 'Extracting...');
+  try {
+    const r = await fetch('/api/web-extractor', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ urls, session_id: state.currentSession }) });
+    const d = await r.json();
+    if (d.success) {
+      state.currentSession = d.session_id;
+      const el = document.getElementById('webResults');
+      el.style.display = 'block';
+      el.innerHTML = `<div style="background:#0f2a1a;border:1px solid #10b981;border-radius:10px;padding:12px 16px;margin-bottom:10px;">
+        <div style="color:#10b981;font-weight:700;font-size:15px;">${d.total_leads_found} contacts found</div>
+        <div style="font-size:11px;color:#64748b;">across ${d.total_urls} URL(s)</div>
+      </div>` + d.results.map(res => `
+        <div style="padding:10px 12px;background:#1a1a2e;border:1px solid #252540;border-radius:8px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+          <div style="font-size:12px;color:#94a3b8;font-family:monospace;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escHtml(res.url)}</div>
+          <div style="display:flex;gap:10px;font-size:11px;flex-shrink:0;margin-left:10px;">
+            <span style="color:#10b981;"><i class="fas fa-envelope"></i> ${res.emails?.length||0}</span>
+            <span style="color:#3b82f6;"><i class="fas fa-phone"></i> ${res.phones?.length||0}</span>
+            <span style="color:${res.status==='success'?'#10b981':'#ef4444'};"><i class="fas fa-${res.status==='success'?'check':'times'}-circle"></i></span>
+          </div>
+        </div>`).join('');
+      updateLeadSession();
+      toast(`Extracted ${d.total_leads_found} contacts`, 'success');
+    } else toast(d.error || 'Extraction failed', 'error');
+  } catch(e) { toast('Request failed', 'error'); }
+  finally { setLoading(btn, false); }
+}
+
+function showValidationResults(containerId, d) {
+  const el = document.getElementById(containerId);
+  el.style.display = 'block';
+  el.innerHTML = `<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+    <div style="text-align:center;padding:10px;background:#0f2a1a;border-radius:10px;border:1px solid #10b981;">
+      <div style="font-size:22px;font-weight:800;color:#10b981;">${d.stats.valid}</div><div style="font-size:11px;color:#6ee7b7;">Valid</div>
+    </div>
+    <div style="text-align:center;padding:10px;background:#2a0f0f;border-radius:10px;border:1px solid #ef4444;">
+      <div style="font-size:22px;font-weight:800;color:#ef4444;">${d.stats.invalid}</div><div style="font-size:11px;color:#fca5a5;">Invalid</div>
+    </div>
+  </div>` + (d.valid_preview||[]).slice(0,10).map(lead => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#1a1a2e;border-radius:8px;margin-bottom:4px;border-left:3px solid #10b981;">
+      <span style="font-size:12px;font-family:monospace;color:#e2e8f0;">${escHtml(lead.value)}</span>
+      <div style="display:flex;gap:4px;"><span class="badge badge-${lead.priority}">${lead.priority}</span><span class="badge" style="background:#1e1e30;color:#94a3b8;">${lead.role}</span></div>
+    </div>`).join('');
+}
+
+async function updateLeadSession() {
+  if (!state.currentSession) return;
+  try {
+    const r = await fetch(`/api/session/${state.currentSession}`);
+    const d = await r.json();
+    document.getElementById('leadNoSession').style.display = 'none';
+    document.getElementById('leadSessionInfo').style.display = 'block';
+    document.getElementById('leadActions').style.display = 'flex';
+    document.getElementById('sessionBadge').textContent = state.currentSession.substring(0,8);
+    document.getElementById('sessionLeadCount').textContent = `${d.total_leads} leads`;
+    if (d.total_leads > 0) sortLeads(state.currentSort);
+  } catch(e) {}
+}
+
+async function sortLeads(type) {
+  if (!state.currentSession) return;
+  state.currentSort = type;
+  try {
+    const r = await fetch(`/api/sorter/${state.currentSession}?type=${type}`);
+    const d = await r.json();
+    if (d.error) return;
+    const view = document.getElementById('sortedLeadView');
+    let html = `<div style="margin-bottom:10px;font-size:12px;color:#64748b;">Sorted by <strong style="color:#a78bfa;">${type}</strong> • ${d.total} total leads</div>`;
+    Object.entries(d.leads).forEach(([group, leads]) => {
+      html += `<div style="margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;">${group} (${leads.length})</div>
+        <div style="overflow:hidden;border-radius:10px;border:1px solid #252540;">
+          <table class="data-table"><thead><tr><th>Contact</th><th>Type</th><th>Domain</th><th>Role</th><th>Priority</th><th>Score</th></tr></thead><tbody>`;
+      leads.slice(0,50).forEach(l => {
+        html += `<tr><td style="font-family:monospace;font-size:12px;">${escHtml(l.value)}</td><td><span class="badge" style="background:#1e1e30;color:#94a3b8;">${l.type}</span></td><td style="font-size:12px;color:#64748b;">${escHtml(l.domain)}</td><td><span class="badge badge-${l.role}">${l.role}</span></td><td><span class="badge badge-${l.priority}">${l.priority}</span></td><td style="font-size:12px;color:#94a3b8;">${Math.round(l.confidence_score*100)}%</td></tr>`;
+      });
+      if (leads.length > 50) html += `<tr><td colspan="6" style="color:#64748b;font-size:12px;text-align:center;">... and ${leads.length-50} more</td></tr>`;
+      html += `</tbody></table></div></div>`;
+    });
+    view.innerHTML = html;
+  } catch(e) {}
+}
+
+function exportLeads(fmt) { if (state.currentSession) window.open(`/api/export/${state.currentSession}?format=${fmt}&sort_by=${state.currentSort}`, '_blank'); }
+
+async function deleteSession() {
+  if (!state.currentSession) return;
+  if (!confirm('Delete all leads in this session?')) return;
+  try {
+    await fetch(`/api/session/${state.currentSession}`, { method: 'DELETE' });
+    state.currentSession = null;
+    document.getElementById('leadSessionInfo').style.display = 'none';
+    document.getElementById('leadNoSession').style.display = 'block';
+    document.getElementById('leadActions').style.display = 'none';
+    toast('Session cleared', 'info');
+  } catch(e) { toast('Failed to delete session', 'error'); }
+}
+
+function clearTextSession() { document.getElementById('textInput').value = ''; document.getElementById('textResults').style.display = 'none'; }
+
+// TEMPLATES
+async function loadTemplates() {
+  try {
+    const r = await fetch('/api/templates');
+    const templates = await r.json();
+    const list = document.getElementById('templateList');
+    if (!templates.length) { list.innerHTML = '<div style="color:#64748b;font-size:13px;text-align:center;padding:20px;">No templates yet</div>'; return; }
+    list.innerHTML = templates.map(t => `
+      <div class="card-sm" style="padding:14px;cursor:pointer;" onclick="openTemplateEditor('${escHtml(t.name)}')">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="font-weight:600;font-size:13px;">${escHtml(t.name)}</div>
+          <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();deleteTemplate('${escHtml(t.name)}')" style="padding:4px 8px;font-size:10px;"><i class="fas fa-trash"></i></button>
+        </div>
+        <div style="font-size:11px;color:#64748b;margin-top:4px;">${t.size_kb}KB • ${t.modified_str} ${t.attachment_count?`• ${t.attachment_count} attach`:''}</div>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function openTemplateEditor(name=null) {
+  state.editingTemplate = name;
+  document.getElementById('templateEditor').style.display = 'block';
+  document.getElementById('templatePlaceholder').style.display = 'none';
+  if (name) {
+    document.getElementById('editorTitle').textContent = 'Edit: ' + name;
+    document.getElementById('templateName').value = name;
+    document.getElementById('templateName').disabled = true;
+    try {
+      const r = await fetch(`/api/templates/${encodeURIComponent(name)}`);
+      const d = await r.json();
+      document.getElementById('templateContent').value = d.content || '';
+      loadAttachments(name);
+    } catch(e) {}
+  } else {
+    document.getElementById('editorTitle').textContent = 'New Template';
+    document.getElementById('templateName').value = '';
+    document.getElementById('templateName').disabled = false;
+    document.getElementById('templateContent').value = getDefaultTemplate();
+    document.getElementById('attachmentList').innerHTML = '';
+  }
+}
+
+function closeTemplateEditor() { document.getElementById('templateEditor').style.display = 'none'; document.getElementById('templatePlaceholder').style.display = 'flex'; state.editingTemplate = null; }
+
+async function saveTemplate() {
+  const name = document.getElementById('templateName').value.trim();
+  const content = document.getElementById('templateContent').value;
+  if (!name) return toast('Enter a template name', 'error');
+  if (!content) return toast('Template content is empty', 'error');
+  try {
+    const r = await fetch('/api/templates', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ name, content }) });
+    const d = await r.json();
+    if (d.success) { toast('Template saved', 'success'); state.editingTemplate = name; loadTemplates(); }
+    else toast(d.error || 'Save failed', 'error');
+  } catch(e) { toast('Save failed', 'error'); }
+}
+
+async function deleteTemplate(name) {
+  if (!confirm(`Delete template "${name}"?`)) return;
+  try { await fetch(`/api/templates/${encodeURIComponent(name)}`, { method: 'DELETE' }); toast('Template deleted', 'success'); closeTemplateEditor(); loadTemplates(); }
+  catch(e) { toast('Delete failed', 'error'); }
+}
+
+async function loadAttachments(name) {
+  try {
+    const r = await fetch(`/api/templates/${encodeURIComponent(name)}/attachments`);
+    const attachments = await r.json();
+    document.getElementById('attachmentList').innerHTML = attachments.map(a => `
+      <div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:#0f0f1a;border:1px solid #2a2a45;border-radius:8px;font-size:12px;">
+        <i class="fas fa-${a.type==='image'?'image':'file'}"></i><span style="color:#94a3b8;">${escHtml(a.filename)}</span><span style="color:#64748b;">${a.size_kb}KB</span>
+        <button onclick="deleteAttachment('${escHtml(name)}','${escHtml(a.filename)}')" style="background:none;border:none;color:#ef4444;cursor:pointer;padding:0;margin-left:2px;"><i class="fas fa-times"></i></button>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function uploadAttachment(input) {
+  const name = state.editingTemplate || document.getElementById('templateName').value.trim();
+  if (!name) return toast('Save template first', 'error');
+  if (!input.files[0]) return;
+  const fd = new FormData();
+  fd.append('file', input.files[0]);
+  try {
+    const r = await fetch(`/api/templates/${encodeURIComponent(name)}/attachments`, { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.success) { toast('Attachment added', 'success'); loadAttachments(name); }
+    else toast(d.error || 'Upload failed', 'error');
+  } catch(e) { toast('Upload failed', 'error'); }
+  input.value = '';
+}
+
+async function deleteAttachment(template, filename) {
+  try { await fetch(`/api/templates/${encodeURIComponent(template)}/attachments/${encodeURIComponent(filename)}`, { method: 'DELETE' }); loadAttachments(template); toast('Attachment removed', 'success'); }
+  catch(e) {}
+}
+
+function previewTemplate() {
+  const name = state.editingTemplate || document.getElementById('templateName').value.trim();
+  if (!name) return toast('Save template first to preview', 'warning');
+  document.getElementById('previewModal').style.display = 'flex';
+  document.getElementById('previewFrame').src = `/api/templates/${encodeURIComponent(name)}/preview`;
+}
+
+function closePreview() { document.getElementById('previewModal').style.display = 'none'; document.getElementById('previewFrame').src = ''; }
+
+function getDefaultTemplate() {
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body { font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0; }
+  .container { max-width: 600px; margin: 20px auto; background: white; border-radius: 8px; overflow: hidden; }
+  .header { background: linear-gradient(135deg, #6366f1, #8b5cf6); padding: 32px 24px; text-align: center; color: white; }
+  .body { padding: 32px 24px; color: #333; line-height: 1.6; }
+  .cta { display: inline-block; padding: 12px 28px; background: #6366f1; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 16px 0; }
+  .footer { padding: 16px 24px; background: #f4f4f4; color: #999; font-size: 12px; text-align: center; }
+</style></head>
+<body>
+<div class="container">
+  <div class="header"><h1 style="margin:0;">Hello, {{name}}!</h1></div>
+  <div class="body">
+    <p>We noticed you might be interested in what we have to offer.</p>
+    <p>We're reaching out to share something valuable with you and your team at <strong>{{company}}</strong>.</p>
+    <a href="{{cta_url}}" class="cta">Learn More</a>
+    <p>Best regards,<br>The Team</p>
+  </div>
+  <div class="footer">You're receiving this because you opted in. <a href="{{unsubscribe_url}}" style="color:#999;">Unsubscribe</a></div>
+</div>
+</body></html>`;
+}
+
+// RECIPIENTS
+async function loadRecipients() {
+  try {
+    const r = await fetch('/api/recipient-files');
+    const files = await r.json();
+    const el = document.getElementById('recipientFileList');
+    if (!files.length) { el.innerHTML = '<div style="color:#64748b;font-size:13px;text-align:center;padding:40px;">No recipient files uploaded yet</div>'; return; }
+    el.innerHTML = `<div style="overflow:hidden;border-radius:12px;border:1px solid #252540;">
+      <table class="data-table"><thead><tr><th>File Name</th><th>Recipients</th><th>Size</th><th>Uploaded</th><th>Actions</th></tr></thead><tbody>` +
+      files.map(f => `<tr><td style="font-weight:600;">${escHtml(f.display_name)}</td><td>${f.row_count.toLocaleString()}</td><td style="color:#64748b;">${f.size_mb}MB</td><td style="color:#64748b;font-size:12px;">${f.modified_str}</td><td><button class="btn btn-danger btn-sm" onclick="deleteRecipientFile('${escHtml(f.name)}')"><i class="fas fa-trash"></i></button></td></tr>`).join('') +
+      '</tbody></table></div>';
+  } catch(e) {}
+}
+
+async function uploadRecipientCsv(input) {
+  if (!input.files[0]) return;
+  const fd = new FormData();
+  fd.append('file', input.files[0]);
+  try {
+    const r = await fetch('/api/upload-csv', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.success) { toast(`Uploaded: ${d.total_rows} recipients`, 'success'); loadRecipients(); }
+    else toast(d.error || 'Upload failed', 'error');
+  } catch(e) { toast('Upload failed', 'error'); }
+  input.value = '';
+}
+
+async function deleteRecipientFile(name) {
+  if (!confirm(`Delete recipient file "${name}"?`)) return;
+  try { await fetch(`/api/recipient-files/${encodeURIComponent(name)}`, { method: 'DELETE' }); toast('File deleted', 'success'); loadRecipients(); }
+  catch(e) { toast('Delete failed', 'error'); }
+}
+
+// CAMPAIGNS
+let campaignPoll = null;
+
+async function loadCampaigns() {
+  try {
+    const [tr, rr] = await Promise.all([fetch('/api/templates'), fetch('/api/recipient-files')]);
+    const [templates, recFiles] = await Promise.all([tr.json(), rr.json()]);
+    document.getElementById('campTemplate').innerHTML = '<option value="">— select template —</option>' + templates.map(t => `<option value="${escHtml(t.name)}">${escHtml(t.name)}</option>`).join('');
+    document.getElementById('campRecipients').innerHTML = '<option value="">— select recipients —</option>' + recFiles.map(f => `<option value="${escHtml(f.name)}">${escHtml(f.display_name)} (${f.row_count} emails)</option>`).join('');
+
+    const cr = await fetch('/api/campaigns');
+    const cd = await cr.json();
+    const campaigns = cd.campaigns || [];
+    const list = document.getElementById('campaignList');
+    if (!campaigns.length) { list.innerHTML = '<div style="color:#64748b;font-size:13px;text-align:center;padding:40px;"><i class="fas fa-paper-plane" style="font-size:32px;color:#2a2a45;margin-bottom:8px;display:block;"></i>No campaigns yet. Launch your first one!</div>'; return; }
+    list.innerHTML = campaigns.slice().reverse().map(c => `
+      <div class="card" style="padding:18px;">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+              <div style="font-weight:700;font-size:14px;">${escHtml(c.name||c.id)}</div>
+              <span class="badge badge-${c.status}">${c.status}</span>
+              ${c.method?`<span class="badge" style="background:#1e1e30;color:#64748b;">${c.method}</span>`:''}
+            </div>
+            <div style="font-size:12px;color:#64748b;margin-bottom:10px;">${escHtml(c.subject||'')}</div>
+            <div style="display:flex;gap:16px;font-size:12px;">
+              <span style="color:#10b981;"><i class="fas fa-check-circle"></i> ${c.stats?.sent||0} sent</span>
+              <span style="color:#ef4444;"><i class="fas fa-times-circle"></i> ${c.stats?.failed||0} failed</span>
+              <span style="color:#64748b;"><i class="fas fa-users"></i> ${c.total_recipients||0} total</span>
+            </div>
+            ${(c.total_recipients||0)>0?`<div class="progress-bar" style="margin-top:10px;"><div class="progress-fill" style="width:${Math.min(100,Math.round(((c.stats?.sent||0)+(c.stats?.failed||0))/(c.total_recipients||1)*100))}%"></div></div>`:''}
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            ${c.status==='running'?`<button class="btn btn-danger btn-sm" onclick="stopCampaign('${c.id}')"><i class="fas fa-stop"></i> Stop</button>`:''}
+            <button class="btn btn-ghost btn-sm" onclick="deleteCampaign('${c.id}')"><i class="fas fa-trash"></i></button>
+          </div>
+        </div>
+      </div>`).join('');
+    if (campaigns.some(c => c.status === 'running')) { clearTimeout(campaignPoll); campaignPoll = setTimeout(loadCampaigns, 5000); }
+  } catch(e) {}
+}
+
+async function startCampaign() {
+  const name = document.getElementById('campName').value.trim();
+  const subject = document.getElementById('campSubject').value.trim();
+  const template = document.getElementById('campTemplate').value;
+  const recipients_file = document.getElementById('campRecipients').value;
+  const reply_to = document.getElementById('campReplyTo').value.trim();
+  const rate_limit = parseInt(document.getElementById('campRate').value) || 5;
+  if (!subject) return toast('Subject line is required', 'error');
+  if (!template) return toast('Select a template', 'error');
+  if (!recipients_file) return toast('Select a recipients file', 'error');
+  try {
+    const r = await fetch('/api/campaign/start', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ campaign_name: name||`Campaign_${Date.now()}`, subject, template, recipients_file, reply_to, rate_limit }) });
+    const d = await r.json();
+    if (d.success) { toast(`Campaign ${d.campaign_id} started!`, 'success'); loadCampaigns(); }
+    else toast(d.error || 'Failed to start', 'error');
+  } catch(e) { toast('Request failed', 'error'); }
+}
+
+async function stopCampaign(id) {
+  try { const r = await fetch(`/api/campaign/${id}/stop`, { method: 'POST' }); const d = await r.json(); if (d.success) { toast('Campaign stopped', 'info'); loadCampaigns(); } else toast(d.error, 'error'); }
+  catch(e) {}
+}
+
+async function deleteCampaign(id) {
+  if (!confirm('Delete this campaign?')) return;
+  try { await fetch(`/api/campaigns/${id}`, { method: 'DELETE' }); toast('Deleted', 'success'); loadCampaigns(); }
+  catch(e) {}
+}
+
+// BLACKLIST
+async function loadBlacklist() {
+  try {
+    const r = await fetch('/api/blacklist');
+    const d = await r.json();
+    document.getElementById('blacklistCount').textContent = `${d.total} emails in blacklist`;
+    const el = document.getElementById('blacklistItems');
+    if (!d.items.length) { el.innerHTML = '<div style="color:#64748b;font-size:13px;">Blacklist is empty</div>'; return; }
+    el.innerHTML = d.items.map(e => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #1e1e30;">
+        <span style="font-size:12px;font-family:monospace;color:#94a3b8;">${escHtml(e)}</span>
+        <button class="btn btn-ghost btn-sm" onclick="removeFromBlacklist('${escHtml(e)}')" style="padding:3px 8px;font-size:10px;"><i class="fas fa-times"></i></button>
+      </div>`).join('');
+  } catch(e) {}
+}
+
+async function addToBlacklist() {
+  const text = document.getElementById('blAddEmails').value.trim();
+  if (!text) return toast('Enter at least one email', 'error');
+  const emails = text.split('\n').map(e => e.trim()).filter(e => e.includes('@'));
+  if (!emails.length) return toast('No valid emails found', 'error');
+  try {
+    const r = await fetch('/api/blacklist', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ emails }) });
+    const d = await r.json();
+    if (d.success) { document.getElementById('blAddEmails').value=''; toast(`${d.added} emails added`, 'success'); loadBlacklist(); }
+  } catch(e) { toast('Failed', 'error'); }
+}
+
+async function removeFromBlacklist(email) {
+  try { await fetch('/api/blacklist', { method: 'DELETE', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ emails: [email] }) }); loadBlacklist(); }
+  catch(e) {}
+}
+
+async function importBlacklist(input) {
+  if (!input.files[0]) return;
+  const fd = new FormData();
+  fd.append('file', input.files[0]);
+  try {
+    const r = await fetch('/api/blacklist/import', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.success) { toast(`Imported ${d.new} new emails (${d.total} total)`, 'success'); loadBlacklist(); }
+  } catch(e) { toast('Import failed', 'error'); }
+  input.value = '';
+}
+
+function exportBlacklist() { window.open('/api/blacklist/export', '_blank'); }
+
+// SETTINGS
+async function loadSettings() {
+  try {
+    const r = await fetch('/api/config');
+    const c = await r.json();
+    state.config = c;
+    document.getElementById('smtpServer').value = c.smtp?.server || '';
+    document.getElementById('smtpPort').value = c.smtp?.port || 587;
+    document.getElementById('smtpUser').value = c.smtp?.username || '';
+    document.getElementById('smtpPass').value = c.smtp?.password || '';
+    const proto = c.smtp?.use_ssl ? 'ssl' : c.smtp?.use_tls ? 'tls' : 'none';
+    document.getElementById('smtpProto').value = proto;
+    document.getElementById('fromName').value = c.email?.from_name || '';
+    document.getElementById('fromEmail').value = c.email?.from_email || '';
+    document.getElementById('replyTo').value = c.email?.reply_to || '';
+    document.getElementById('ctaUrl').value = c.campaign?.cta_url || '';
+    document.getElementById('unsubUrl').value = c.campaign?.unsubscribe_url || '';
+    document.getElementById('rateLimit').value = c.campaign?.rate_limit || 5;
+    const adv = c.advanced || {};
+    document.getElementById('advMethod').value = adv.method || 'SMTP';
+    document.getElementById('useProxy').checked = adv.useProxy || false;
+    document.getElementById('useConcurrency').checked = adv.useConcurrency || false;
+    document.getElementById('concurrencyLimit').value = adv.concurrencyLimit || 5;
+    document.getElementById('proxyType').value = adv.proxyType || 'SOCKS5';
+    document.getElementById('proxyHost').value = adv.proxyHost || '';
+    document.getElementById('proxyPort').value = adv.proxyPort || 1080;
+    document.getElementById('proxyUser').value = adv.proxyUsername || '';
+    document.getElementById('proxyPass').value = adv.proxyPassword || '';
+    toggleProxyFields();
+    toggleConcurrency();
+  } catch(e) {}
+}
+
+function toggleProxyFields() { const el = document.getElementById('proxyFields'); el.style.display = document.getElementById('useProxy').checked ? 'flex' : 'none'; }
+function toggleConcurrency() { const el = document.getElementById('concurrencyField'); el.style.display = document.getElementById('useConcurrency').checked ? 'block' : 'none'; }
+
+async function saveSettings() {
+  const proto = document.getElementById('smtpProto').value;
+  const config = {
+    smtp: { server: document.getElementById('smtpServer').value.trim(), port: parseInt(document.getElementById('smtpPort').value) || 587, username: document.getElementById('smtpUser').value.trim(), password: document.getElementById('smtpPass').value, use_tls: proto === 'tls', use_ssl: proto === 'ssl' },
+    email: { from_name: document.getElementById('fromName').value.trim(), from_email: document.getElementById('fromEmail').value.trim(), reply_to: document.getElementById('replyTo').value.trim() },
+    campaign: { rate_limit: parseInt(document.getElementById('rateLimit').value) || 5, max_emails_per_batch: 50, parallel_workers: 3, cta_url: document.getElementById('ctaUrl').value.trim(), unsubscribe_url: document.getElementById('unsubUrl').value.trim() },
+    advanced: {
+      method: document.getElementById('advMethod').value, useAuthentication: true,
+      useProxy: document.getElementById('useProxy').checked, proxyType: document.getElementById('proxyType').value,
+      smtpHost: document.getElementById('smtpServer').value.trim(), smtpPort: parseInt(document.getElementById('smtpPort').value) || 587, smtpSecure: proto === 'ssl', secureProtocol: 'TLSv1_2_method',
+      proxyHost: document.getElementById('proxyHost').value.trim(), proxyPort: parseInt(document.getElementById('proxyPort').value) || 1080,
+      proxyUsername: document.getElementById('proxyUser').value.trim(), proxyPassword: document.getElementById('proxyPass').value,
+      useConcurrency: document.getElementById('useConcurrency').checked, concurrencyLimit: parseInt(document.getElementById('concurrencyLimit').value) || 5,
+      includeAttachments: true, ENABLE_ENCRYPTION: false, Encode_Attachment: false
+    }
+  };
+  try {
+    const r = await fetch('/api/config', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(config) });
+    const d = await r.json();
+    if (d.success) toast('Settings saved', 'success');
+    else toast(d.error || 'Save failed', 'error');
+  } catch(e) { toast('Save failed', 'error'); }
+}
+
+async function testSmtp() {
+  const btn = document.getElementById('testSmtpBtn');
+  setLoading(btn, true, 'Testing...');
+  try {
+    const proto = document.getElementById('smtpProto').value;
+    const config = {
+      smtp: { server: document.getElementById('smtpServer').value.trim(), port: parseInt(document.getElementById('smtpPort').value) || 587, username: document.getElementById('smtpUser').value.trim(), password: document.getElementById('smtpPass').value, use_tls: proto === 'tls', use_ssl: proto === 'ssl' },
+      advanced: { method: document.getElementById('advMethod').value, useAuthentication: true, smtpHost: document.getElementById('smtpServer').value.trim(), smtpPort: parseInt(document.getElementById('smtpPort').value) || 587, smtpSecure: proto === 'ssl', useProxy: document.getElementById('useProxy').checked, proxyType: document.getElementById('proxyType').value, proxyHost: document.getElementById('proxyHost').value.trim(), proxyPort: parseInt(document.getElementById('proxyPort').value) || 1080, proxyUsername: document.getElementById('proxyUser').value.trim(), proxyPassword: document.getElementById('proxyPass').value }
+    };
+    const r = await fetch('/api/test-smtp', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(config) });
+    const d = await r.json();
+    toast(d.message, d.success ? 'success' : 'error');
+  } catch(e) { toast('Test failed', 'error'); }
+  finally { setLoading(btn, false); }
+}
+
+// INIT
+loadDashboard();
+setInterval(loadDashboard, 30000);
+</script>
+</body>
+</html>

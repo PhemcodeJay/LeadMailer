@@ -1,0 +1,44 @@
+{
+  "name": "leadmailer",
+  "version": "1.0.0",
+  "description": "LeadMailer Suite — unified lead collection and email marketing platform",
+  "main": "app.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js",
+    "test": "node --test test/",
+    "typecheck": "node --check app.js",
+    "build": "node app.js --build-only",
+    "docker-build": "docker build -t leadmailer .",
+    "docker-up": "docker compose up"
+  },
+  "keywords": [
+    "lead",
+    "email",
+    "marketing",
+    "smtp",
+    "crm",
+    "scraper"
+  ],
+  "author": "LeadMailer",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.7.9",
+    "better-sqlite3": "^11.7.0",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "libphonenumber-js": "^1.11.18",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.16",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

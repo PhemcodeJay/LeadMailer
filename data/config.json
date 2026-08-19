@@ -1,0 +1,42 @@
+{
+  "smtp": {
+    "server": "",
+    "port": 587,
+    "username": "",
+    "password": "",
+    "use_tls": true,
+    "use_ssl": false
+  },
+  "email": {
+    "from_email": "",
+    "from_name": "LeadMailer Suite",
+    "reply_to": ""
+  },
+  "campaign": {
+    "rate_limit": 5,
+    "max_emails_per_batch": 50,
+    "parallel_workers": 3,
+    "cta_url": "",
+    "unsubscribe_url": ""
+  },
+  "advanced": {
+    "method": "SMTP",
+    "useAuthentication": true,
+    "useProxy": false,
+    "proxyType": "SOCKS5",
+    "smtpHost": "",
+    "smtpPort": 587,
+    "smtpSecure": false,
+    "secureProtocol": "TLSv1_2_method",
+    "proxyHost": "",
+    "proxyPort": 1080,
+    "proxyUsername": "",
+    "proxyPassword": "",
+    "useConcurrency": false,
+    "concurrencyLimit": 5,
+    "includeAttachments": true,
+    "attachmentPath": "",
+    "ENABLE_ENCRYPTION": false,
+    "Encode_Attachment": false
+  }
+}

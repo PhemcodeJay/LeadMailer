@@ -1,0 +1,14 @@
+version: "3.8"
+
+services:
+  leadmailer:
+    build: .
+    container_name: leadmailer
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+    volumes:
+      - ./data:/app/data
+      - ./leads.db:/app/leads.db
+    restart: unless-stopped
