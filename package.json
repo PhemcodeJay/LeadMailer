@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "node app.js",
-    "test": "node --test test/",
+    "test": "node --test test/*.test.js",
     "typecheck": "node --check app.js",
     "build": "node app.js --build-only",
     "docker-build": "docker build -t leadmailer .",
